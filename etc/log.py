@@ -1,4 +1,4 @@
-#
+# 
 # some Outputs for developing and debuging
 # Author: DerHirschi
 from var import get_time, date2filename
