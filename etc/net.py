@@ -1,3 +1,4 @@
+# Author : DerHirschi
 import commands
 import os
 
