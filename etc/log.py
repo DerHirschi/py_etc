@@ -1,6 +1,7 @@
-# 
+#
 # some Outputs for developing and debuging
-# Author: DerHirschi
+#
+
 from var import get_time, date2filename
 
 
@@ -50,16 +51,25 @@ class DEBUGlogConf(logDefaultConf):
     log_filename    = 'debug.log'   # Dateiname
     filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
+class FileERRlogConf(logDefaultConf):
+    log_flag        = '>< Cant open File > : '
+    print_out       = True          # Ausgabe via print in console
+    file_out        = True          # Ausgabe via Dateiausgabe
+    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
+    #log_filename    = 'debug.log'   # Dateiname
+    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
 # log mit verschiedenen Optionen & Ausgabeorten ( f z.B verschiedene Module )
 # 0 = Default Log Ausgabe... Einstellungen siehe oben
 # 1 = Default ERRORLog Ausgabe... Einstellungen siehe oben
-# 2 = DEBUGLog Ausgabe... Einstellungen siehe oben
+# 2 = Default Filesys Error Ausgabe... Einstellungen siehe oben
+# 9 = DEBUGLog Ausgabe... Einstellungen siehe oben
 def log(data, opt=0):
     try:
         _opt = {
             1: ERRORlogDefaultConf,
-            2: DEBUGlogConf
+            2: FileERRlogConf,
+            9: DEBUGlogConf
         }[opt]
         if _opt.print_out or _opt.file_out:
             out(data, _opt.print_out, _opt.file_out, _opt)
@@ -91,13 +101,16 @@ def out(data, p_out=logDefaultConf.print_out, f_out=logDefaultConf.file_out,
             _f_n = conf_obj.log_path + date2filename(conf_obj.log_filename)
         else:
             _f_n = conf_obj.log_path + conf_obj.log_filename
-        f = open(_f_n, 'a')
-        if type(data) == list or type(data) == tuple:
-            for i in range(len(data)):
-                f.write(_mk_st(data[i], conf_obj.file_ts, conf_obj.file_ts_opt) + '\n')
-        else:
-            f.write(_mk_st(data, conf_obj.file_ts, conf_obj.file_ts_opt) + '\n')
-        f.close()
+        try:
+            f = open(_f_n, 'a')
+            if type(data) == list or type(data) == tuple:
+                for i in range(len(data)):
+                    f.write(_mk_st(data[i], conf_obj.file_ts, conf_obj.file_ts_opt) + '\n')
+            else:
+                f.write(_mk_st(data, conf_obj.file_ts, conf_obj.file_ts_opt) + '\n')
+            f.close()
+        except:
+            print 'ERROR Log System log.py out().. Cant open Logfile.. Endlessloop'
 
 
 # Variablen Details

@@ -1,4 +1,3 @@
-# Author: DerHirschi
 import os
 import time
 
@@ -29,11 +28,9 @@ def string2array(data, cut_flag=' ', cut_blank=True, conv2int=True):
                 _temp = _temp + [_data[i]]
     return _temp
 
-
 # Quelle: https://stackoverflow.com/questions/931092/reverse-a-string-in-python
 def rev_str(a_string):
     return a_string[::-1]
-
 
 def get_time(opt='all', string=False):
     def _monat(lst, trig):
@@ -132,5 +129,12 @@ def count_filename(f_name, opt='count'):
             'time': _count_st(_n + build_date_st(opt, '-'), _e)
         }[opt]
 
+# Andert Dateiendung
+def change_file_ext(f_name, ext):
+    return f_name[:(f_name.find('.'))] + '.{}'.format(ext)
 
 
+# Test it !!
+
+if __name__ == '__main__':
+    print change_file_ext('test.txt', 'crp')
