@@ -1,4 +1,5 @@
 # Author: DerHirschi
+import os
 import time
 
 
@@ -27,6 +28,11 @@ def string2array(data, cut_flag=' ', cut_blank=True, conv2int=True):
             except:
                 _temp = _temp + [_data[i]]
     return _temp
+
+
+# Quelle: https://stackoverflow.com/questions/931092/reverse-a-string-in-python
+def rev_str(a_string):
+    return a_string[::-1]
 
 
 def get_time(opt='all', string=False):
@@ -73,11 +79,19 @@ def get_time(opt='all', string=False):
     }[opt]
 
 
+# Fuegt an Dateinamenstring Datum oder Zeit an
+# 1 Dateiname
+# 2 Option ('date'/'time')
+# 3 Cut Flag -> c_f='_' -> 2017_9_1 or c_f='!' -> 2017!9!1
+# !!!! Prueft nicht ob Datei schon existiert !!!! fuer log Funktion
+
 def date2filename(f_name, time_form='date', cut_flag='_'):
     _i = f_name.find('.')
     _temp = f_name[_i:]
     return f_name[:_i] + '_' + build_date_st(time_form, cut_flag) + _temp
 
+# 1 Option 'date'/'time'/'all'
+# 2 Cut_Flag -> c_f='_' -> 2017_9_1 or c_f='!' -> 2017!9!1
 
 def build_date_st(t_f, c_f):
     if t_f == 'all':
@@ -87,4 +101,36 @@ def build_date_st(t_f, c_f):
             'date': str(get_time('year')) + c_f + str(get_time('mon')) + c_f + str(get_time('day')),
             'time': str(get_time('h')) + c_f + str(get_time('min')) + c_f + str(get_time('sek')),
         }[t_f]
+
+# Prueft ob Datei schon existiert.
+# Wenn ja wird ein count (_1 / _2 ...) an den Dateinamen angehaengt
+# und der neue Dateinnamen String zurueck gegeben
+# 1 Dateiname
+# 2 Option ( 'count'/'date'/'time' ) -> date & time fuegt Datum oder Zeit vor dem Count ein
+
+def count_filename(f_name, opt='count'):
+    def _count_st(_f_name, _end):
+        if not os.path.exists(_f_name + _end):
+            return _f_name + _end
+        else:
+            _n = 1
+            _l = len(_f_name)
+            while os.path.exists(_f_name + _end):
+                _f_name = _f_name[:_l] + '_{}'.format(_n)
+                _n += 1
+            return _f_name + _end
+
+    _i = (f_name.find('.'))
+    _e = f_name[_i:]
+    _n = f_name[:_i]
+
+    if opt == 'count':
+        return _count_st(_n, _e)
+    else:
+        return {
+            'date': _count_st(_n + build_date_st(opt, '-'), _e),
+            'time': _count_st(_n + build_date_st(opt, '-'), _e)
+        }[opt]
+
+
 
