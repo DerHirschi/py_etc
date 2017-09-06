@@ -64,10 +64,12 @@ def enc_file(f_ile, key, f_ext='enc', iv_add=True):
         _wf = try_file(_wf_name, 'w')
         if _rf and _wf:
             _res = enc(key, _rf.read())
+            _rf.close()
             if iv_add:
                 _wf.write(_res[1] + _res[0])
             else:
                 _wf.write(_res[0])
+            _wf.close()
             return _res[1], _wf_name
 
 # 1 Path + Filename
@@ -82,12 +84,14 @@ def dec_file(f_ile, key, f_ext='dec', iv=''):
         _wf = try_file(_wf_name, 'w')
         if _rf and _wf:
             _tmp = _rf.read()
+            _rf.close()
             if iv == '':
                 _wf.write(dec(key, _tmp[16:], _tmp[:16]))
-                return _wf_name
             else:
                 _wf.write(dec(key, _tmp, iv))
-                return _wf_name
+
+            _wf.close()
+            return _wf_name
         else:
             return ''
     else:
