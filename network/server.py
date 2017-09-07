@@ -1,3 +1,4 @@
+# Author DerHirschi
 import socket
 import threading
 import time
@@ -7,11 +8,11 @@ from etc.net import fw
 
 
 class ServerCfg(object):
-    ip = '10.8.0.6'
-    port = 2222
+    ip      = '10.8.0.6'
+    port    = 2222
     encrypt = True
     timeout = 45
-    cach = 256
+    cach    = 256
     max_con = 2
 
     run_ind = True
@@ -28,15 +29,12 @@ class Server(threading.Thread):
         self.conf.sockobj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conf.sockobj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         log('Try to start on IP: {} , Port: {}'.format(self.conf.ip, self.conf.port), 10)
-        log('Setup Firewall ...', 10)
-        log('Setup Firewall ...', 12)
+        log('Setup Firewall ...', [10, 12])
         _fwrules = fw('', True, 'tcp', '{}'.format(self.conf.port), '', self.conf.ip )
         if _fwrules != '':
-            log('Firewall setup finished .', 10)
-            log('Firewall setup finished .', 12)
+            log('Firewall setup finished .', [10, 12])
         else:
-            log('Cant setup Firewall .. Please check...', 11)
-            log('Cant setup Firewall .. Please check...', 13)
+            log('Cant setup Firewall .. Please check...', [11, 13])
 
         try:
             self.conf.sockobj.bind((self.conf.ip, self.conf.port))
@@ -70,11 +68,9 @@ class Server(threading.Thread):
 
         if _fwrules != '':
             if fw(_fwrules[0]) != '':
-                log('Firewall setup finished .', 10)
-                log('Firewall setup finished .', 12)
+                log('Firewall setup finished .', [10, 12])
             else:
-                log('Cant setup Firewall .. Please check...', 11)
-                log('Cant setup Firewall .. Please check...', 13)
+                log('Cant setup Firewall .. Please check...', [11, 13])
 
     def listen2client(self, clt, fuck_dummy):
         while self.conf.run_ind:
