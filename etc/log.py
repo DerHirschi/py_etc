@@ -1,4 +1,4 @@
-#
+# Author DerHirschi
 # some Outputs for developing and debuging
 #
 
@@ -51,28 +51,60 @@ class DEBUGlogConf(logDefaultConf):
     log_filename    = 'debug.log'   # Dateiname
     filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
-class FileERRlogConf(logDefaultConf):
-    log_flag        = '>< Cant open File > : '
+class FileERRlogConf(ERRORlogDefaultConf):
+    log_flag        = '>< !! Cant open File !! > : '
+
+
+class ServerLogConf(logDefaultConf):
+    log_flag        = '>< Server > : '
     print_out       = True          # Ausgabe via print in console
     file_out        = True          # Ausgabe via Dateiausgabe
     log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
     #log_filename    = 'debug.log'   # Dateiname
     #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
+class ServerFWLogConf(ServerLogConf):
+    log_flag        = '>< FW > : '
+
+
+class ServerFWERRLogConf(ServerLogConf):
+    log_flag        = '>< !! FW ERROR !! > : '
+
+
+class ServerERRlogConf(ServerLogConf):
+    log_flag        = '>< !! Server ERROR !! > : '
+
+
+class ServerERRDebugConf(DEBUGlogConf):
+    log_flag        = '>< ?? Server DEBUG ?? > : '
+
+
 # log mit verschiedenen Optionen & Ausgabeorten ( f z.B verschiedene Module )
 # 0 = Default Log Ausgabe... Einstellungen siehe oben
 # 1 = Default ERRORLog Ausgabe... Einstellungen siehe oben
 # 2 = Default Filesys Error Ausgabe... Einstellungen siehe oben
 # 9 = DEBUGLog Ausgabe... Einstellungen siehe oben
+# 10= ServerLog Ausgabe... Einstellungen siehe oben
+# 11= ServerError Ausgabe... Einstellungen siehe oben
+# 12= ServerFirewall Ausgabe... Einstellungen siehe oben
+# 19= ServerDebug Ausgabe... Einstellungen siehe oben
 def log(data, opt=0):
+    if type(opt) != list:
+        opt = [opt]
     try:
-        _opt = {
-            1: ERRORlogDefaultConf,
-            2: FileERRlogConf,
-            9: DEBUGlogConf
-        }[opt]
-        if _opt.print_out or _opt.file_out:
-            out(data, _opt.print_out, _opt.file_out, _opt)
+        for i in range(len(opt)):
+            _opt = {
+                1: ERRORlogDefaultConf,
+                2: FileERRlogConf,
+                9: DEBUGlogConf,
+                10: ServerLogConf,
+                11: ServerERRlogConf,
+                12: ServerFWLogConf,
+                13: ServerFWERRLogConf,
+                19: ServerERRDebugConf
+            }[opt[i]]
+            if _opt.print_out or _opt.file_out:
+                out(data, _opt.print_out, _opt.file_out, _opt)
     except:
         if logDefaultConf.print_out or logDefaultConf.file_out:
             out(data, logDefaultConf.print_out, logDefaultConf.file_out, logDefaultConf)
@@ -82,6 +114,7 @@ def log(data, opt=0):
 # 1 Variable
 # 2 Print   Ausgabe (opt) - ansonsten default Einstellunegn oben
 # 3 Logfile Ausgabe (opt) - ansonsten default Einstellunegn oben
+#TODO find and remove extra '\n'
 def out(data, p_out=logDefaultConf.print_out, f_out=logDefaultConf.file_out,
         conf_obj=logDefaultConf):
 
@@ -153,23 +186,4 @@ def var_hint(title, output,
 
     for i in range(len(_tem)):
         out(_tem[i], p_out, f_out)
-
-# Test it !!!
-if __name__ == '__main__':
-    log('test {}'.format(54455645))
-    log('test {}'.format(54455645), 1)
-    log('test {}'.format(54455645), 2)
-    log(['test1','test2',3], 2)
-    out(['this', 'is', 'a', 'test'])
-    out(2)
-    out('string')
-
-    var_hint('TESTTESTTTT', 5235234)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), True, 'sfga'])
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 'sfga'], True)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 325, (333, 335), 325, (333, 335), 'sfga'], True)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 'sfga', 325, (333, 335), 'sfga'], True)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 'sfga', 325, (333, 335), 'sfga'], True, True, True)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 'sfga', 325, (333, 335), 'sfga'], False, True, True)
-    var_hint('TESTTESTTTT', ['test', 325, (333, 335), 'sfga', 325, (333, 335), 'sfga'], False)
 
