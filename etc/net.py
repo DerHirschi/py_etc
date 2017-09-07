@@ -3,6 +3,7 @@ import commands
 import os
 
 from var import string2array, array2sting
+from log import log
 
 
 def getdefault_iface(opt='ip'):
@@ -87,7 +88,7 @@ def calc_ip_subnet(ip, subnet):
 def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_iface(), mode='ACCEPT'):
     # Root User check
     if os.geteuid() != 0:
-        print 'You must be super-user. Cant change Firewall Rules for u..'
+        log('You must be super-user. Cant change Firewall Rules for u..', 13)
         return ''
     else:
         # Rule Reverse Fnc
@@ -114,8 +115,10 @@ def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_i
         if revrule != '':
             _st = _fnc_rev_rules(revrule)
             if _fnc_chk_rules(_st):
+                log('Changed {}'.format(_st), 12)
                 return _st, commands.getoutput('/sbin/' + _st)
             else:
+                log('Cant change {}'.format(_st), 13)
                 return ''
         else:
             switch = {
@@ -141,13 +144,9 @@ def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_i
         )
 
         if _fnc_chk_rules(_st):
+            log('Changed {}'.format(_st), 12)
             return _st, commands.getoutput('/sbin/' + _st)
         else:
+            log('Cant change {}'.format(_st), 13)
             return ''
 
-
-# Test it !!
-if __name__ == '__main__':
-
-    print calc_ip_subnet('192.168.1.101', 16)
-    print calc_ip_subnet('192.168.1.101', '255.255.255.128')
