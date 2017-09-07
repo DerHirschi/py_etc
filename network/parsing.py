@@ -1,16 +1,9 @@
+# Author: DerHirschi -- Datt kann ich besser... aber fuers erste ....
 from etc.var import array2sting
 # TODO Checksumm https://stackoverflow.com/questions/3949726/calculate-ip-checksum-in-python
 class PasingTab:
-    # CFG
-    flag        = 'SFL'
-    st_split    = '%'
-    # vars
-    res         = ''
-    pac         = []
-    # Fuck .. i think i am loop my self
-
     class defaultPacket:
-        flag     = ''
+        flag = ''
         st_split = ''
 
         def server(self, dat):
@@ -18,8 +11,23 @@ class PasingTab:
 
         def client(self, dat):
             print 'client {}'.format(array2sting(dat, self.st_split))
-            print 'st_split {}'.format(self.st_split)
             return self.flag + array2sting(dat, self.st_split)
+
+    class testPacket(defaultPacket):
+        def server(self,dat):
+            print ''
+
+    # Dict for Parsing classes
+    di = {
+        0: defaultPacket(),
+    }
+
+    # CFG
+    flag        = 'SFL'
+    st_split    = '%'
+    # vars
+    res         = ''
+    pac         = []
 
     def __init__(self, data):
         self.flaglen = len(self.flag)
@@ -27,6 +35,7 @@ class PasingTab:
             self.server(data)
         elif type(data) == list:
             self.client(data)
+
 
     def server(self, dt):
 
@@ -50,26 +59,23 @@ class PasingTab:
             return _mt.client(self.pac)
         else:
             return ''
-        #return self.flag + data
 
     def pac_type(self, typ):
 
-        _di = {
-            0: self.defaultPacket(),
-        }
-        if typ in _di:
-            _f = _di[typ]
+        if typ in self.di:
+            _f = self.di[typ]
             _f.st_split = self.st_split
             _f.flag = self.flag
             return _f
 
 
-def parse_pack(packet):
-    return PasingTab(packet).res
+#def parse_pack(packet):
+#    return PasingTab(packet).res
 
 
 PasingTab('SFL0%sdgfsgagrgrg%1111111111111%sagg')
 PasingTab('SFL0%sdgfsgagrgrg 0000000000000')
 PasingTab([0,543,'46346',346,'fg', '1111111111111'])
 PasingTab([0,543,'46346',346,'fg', '0000000000000'])
+
 
