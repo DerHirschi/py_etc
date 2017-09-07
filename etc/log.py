@@ -51,13 +51,9 @@ class DEBUGlogConf(logDefaultConf):
     log_filename    = 'debug.log'   # Dateiname
     filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
-class FileERRlogConf(logDefaultConf):
+class FileERRlogConf(ERRORlogDefaultConf):
     log_flag        = '>< Cant open File > : '
-    print_out       = True          # Ausgabe via print in console
-    file_out        = True          # Ausgabe via Dateiausgabe
-    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
-    #log_filename    = 'debug.log'   # Dateiname
-    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
+
 
 class ServerLogConf(logDefaultConf):
     log_flag        = '>< Server > : '
@@ -67,23 +63,22 @@ class ServerLogConf(logDefaultConf):
     #log_filename    = 'debug.log'   # Dateiname
     #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
+class ServerFWLogConf(ServerLogConf):
+    log_flag        = '>< FW > : '
 
-class ServerERRlogConf(logDefaultConf):
+
+class ServerFWERRLogConf(ServerLogConf):
+    log_flag        = '>< FW ERROR > : '
+
+
+class ServerERRlogConf(ServerLogConf):
     log_flag        = '>< !! Server ERROR !! > : '
-    print_out       = True          # Ausgabe via print in console
-    file_out        = True          # Ausgabe via Dateiausgabe
-    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
-    #log_filename    = 'debug.log'   # Dateiname
-    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
 
-class ServerERRDebugConf(logDefaultConf):
+class ServerERRDebugConf(DEBUGlogConf):
     log_flag        = '>< ?? Server DEBUG ?? > : '
-    print_out       = True          # Ausgabe via print in console
-    file_out        = True          # Ausgabe via Dateiausgabe
-    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
-    #log_filename    = 'debug.log'   # Dateiname
-    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
+
+
 # log mit verschiedenen Optionen & Ausgabeorten ( f z.B verschiedene Module )
 # 0 = Default Log Ausgabe... Einstellungen siehe oben
 # 1 = Default ERRORLog Ausgabe... Einstellungen siehe oben
@@ -91,6 +86,7 @@ class ServerERRDebugConf(logDefaultConf):
 # 9 = DEBUGLog Ausgabe... Einstellungen siehe oben
 # 10= ServerLog Ausgabe... Einstellungen siehe oben
 # 11= ServerError Ausgabe... Einstellungen siehe oben
+# 12= ServerFirewall Ausgabe... Einstellungen siehe oben
 # 19= ServerDebug Ausgabe... Einstellungen siehe oben
 def log(data, opt=0):
     try:
@@ -100,6 +96,8 @@ def log(data, opt=0):
             9: DEBUGlogConf,
             10: ServerLogConf,
             11: ServerERRlogConf,
+            12: ServerFWLogConf,
+            13: ServerFWERRLogConf,
             19: ServerERRDebugConf
         }[opt]
         if _opt.print_out or _opt.file_out:

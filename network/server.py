@@ -1,11 +1,13 @@
 import socket
 import threading
+import time
 
-from etc.log import log, var_hint
+from etc.log import log
+from etc.net import fw
 
 
 class ServerCfg(object):
-    ip = ''
+    ip = '10.8.0.6'
     port = 2222
     encrypt = True
     timeout = 45
@@ -26,12 +28,21 @@ class Server(threading.Thread):
         self.conf.sockobj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conf.sockobj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         log('Try to start on IP: {} , Port: {}'.format(self.conf.ip, self.conf.port), 10)
+        log('Setup Firewall ...', 10)
+        log('Setup Firewall ...', 12)
+        _fwrules = fw('', True, 'tcp', '{}'.format(self.conf.port), '', self.conf.ip )
+        if _fwrules != '':
+            log('Firewall setup finished .', 10)
+            log('Firewall setup finished .', 12)
+        else:
+            log('Cant setup Firewall .. Please check...', 11)
+            log('Cant setup Firewall .. Please check...', 13)
 
         try:
             self.conf.sockobj.bind((self.conf.ip, self.conf.port))
             self.conf.sockobj.listen(self.conf.max_con)
-
             log('started on IP: {} , Port: {}'.format(self.conf.ip, self.conf.port), 10)
+
             log('Waiting for incoming connection ...', 10)
 
             while self.conf.run_ind:
@@ -48,10 +59,22 @@ class Server(threading.Thread):
             else:
                 log('Server {} , {} stoped ...'.format(self.conf.ip, self.conf.port), 10)
                 _n = 1
+                _l = len(self.cli)
                 while len(self.cli) > 0:
                     self.cli[0].shutdown(0)
                     log('Force disconnect Client #{}'.format(_n), 10)
                     _n += 1
+                    while _l == len(self.cli) and len(self.cli) > 0:
+                        time.sleep(0.1)
+                    _l = len(self.cli)
+
+        if _fwrules != '':
+            if fw(_fwrules[0]) != '':
+                log('Firewall setup finished .', 10)
+                log('Firewall setup finished .', 12)
+            else:
+                log('Cant setup Firewall .. Please check...', 11)
+                log('Cant setup Firewall .. Please check...', 13)
 
     def listen2client(self, clt, fuck_dummy):
         while self.conf.run_ind:
