@@ -5,11 +5,11 @@ from etc.log import log, var_hint
 
 
 class ServerCfg(object):
-    ip      = ''
-    port    = 2222
+    ip = ''
+    port = 2222
     encrypt = True
     timeout = 45
-    cach    = 256
+    cach = 256
     max_con = 2
 
     run_ind = True
@@ -35,7 +35,6 @@ class Server(threading.Thread):
             log('Waiting for incoming connection ...', 10)
 
             while self.conf.run_ind:
-                log('Run Trigger 01: {}'.format(self.conf.run_ind), 19)
                 client, address = self.conf.sockobj.accept()
                 log('Connection established with {}'.format(address[0]), 10)
                 client.settimeout(self.conf.timeout)
@@ -48,19 +47,17 @@ class Server(threading.Thread):
                 self.conf.run_ind = False
             else:
                 log('Server {} , {} stoped ...'.format(self.conf.ip, self.conf.port), 10)
-
+                _n = 1
                 while len(self.cli) > 0:
                     self.cli[0].shutdown(0)
+                    log('Force disconnect Client #{}'.format(_n), 10)
+                    _n += 1
 
-
-    def listen2client(self, clt, adr):
-        log('Run started:', 19)
-        log('Run Trigger 02: {}'.format(self.conf.run_ind), 19)
+    def listen2client(self, clt, fuck_dummy):
         while self.conf.run_ind:
             try:
                 data = clt.recv(self.conf.cach)
                 if data and self.conf.run_ind:
-                    print data
                     log('in_Data: {}'.format(data), 19)
                     log('Size: {} Bytes'.format(len(data)), 19)
 
