@@ -59,17 +59,48 @@ class FileERRlogConf(logDefaultConf):
     #log_filename    = 'debug.log'   # Dateiname
     #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 
+class ServerLogConf(logDefaultConf):
+    log_flag        = '>< Server > : '
+    print_out       = True          # Ausgabe via print in console
+    file_out        = True          # Ausgabe via Dateiausgabe
+    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
+    #log_filename    = 'debug.log'   # Dateiname
+    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
+
+
+class ServerERRlogConf(logDefaultConf):
+    log_flag        = '>< !! Server ERROR !! > : '
+    print_out       = True          # Ausgabe via print in console
+    file_out        = True          # Ausgabe via Dateiausgabe
+    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
+    #log_filename    = 'debug.log'   # Dateiname
+    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
+
+
+class ServerERRDebugConf(logDefaultConf):
+    log_flag        = '>< ?? Server DEBUG ?? > : '
+    print_out       = True          # Ausgabe via print in console
+    file_out        = True          # Ausgabe via Dateiausgabe
+    log_path        = ''            # Pfad f Dateiausgabe '' > Projekt Rootverzeichniss
+    #log_filename    = 'debug.log'   # Dateiname
+    #filename_w_date = False         # Datum im Dateinamen (debug.log > debug_2017_9_5.log)
 # log mit verschiedenen Optionen & Ausgabeorten ( f z.B verschiedene Module )
 # 0 = Default Log Ausgabe... Einstellungen siehe oben
 # 1 = Default ERRORLog Ausgabe... Einstellungen siehe oben
 # 2 = Default Filesys Error Ausgabe... Einstellungen siehe oben
 # 9 = DEBUGLog Ausgabe... Einstellungen siehe oben
+# 10= ServerLog Ausgabe... Einstellungen siehe oben
+# 11= ServerError Ausgabe... Einstellungen siehe oben
+# 19= ServerDebug Ausgabe... Einstellungen siehe oben
 def log(data, opt=0):
     try:
         _opt = {
             1: ERRORlogDefaultConf,
             2: FileERRlogConf,
-            9: DEBUGlogConf
+            9: DEBUGlogConf,
+            10: ServerLogConf,
+            11: ServerERRlogConf,
+            19: ServerERRDebugConf
         }[opt]
         if _opt.print_out or _opt.file_out:
             out(data, _opt.print_out, _opt.file_out, _opt)

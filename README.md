@@ -1,1 +1,2 @@
-Some useful Functions for me ... Some of them are just for Linux
+- Some useful Functions for me ... Some of them are just for Linux
+- Simple TCP Server & Client

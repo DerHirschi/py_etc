@@ -28,9 +28,11 @@ def string2array(data, cut_flag=' ', cut_blank=True, conv2int=True):
                 _temp = _temp + [_data[i]]
     return _temp
 
+
 # Quelle: https://stackoverflow.com/questions/931092/reverse-a-string-in-python
 def rev_str(a_string):
     return a_string[::-1]
+
 
 def get_time(opt='all', string=False):
     def _monat(lst, trig):
