@@ -1,3 +1,4 @@
+from etc.var import array2sting
 # TODO Checksumm https://stackoverflow.com/questions/3949726/calculate-ip-checksum-in-python
 class PasingTab:
     # CFG
@@ -9,14 +10,16 @@ class PasingTab:
     # Fuck .. i think i am loop my self
 
     class defaultPacket:
-        def __init__(self, data):
-            self.data = data
+        flag     = ''
+        st_split = ''
 
-        def server(self):
-            print 'server {}'.format(self.data)
+        def server(self, dat):
+            print 'server {}'.format(array2sting(dat[1:], ' '))
 
-        def client(self):
-            print 'client {}'.format(self.data)
+        def client(self, dat):
+            print 'client {}'.format(array2sting(dat, self.st_split))
+            print 'st_split {}'.format(self.st_split)
+            return self.flag + array2sting(dat, self.st_split)
 
     def __init__(self, data):
         self.flaglen = len(self.flag)
@@ -25,32 +28,48 @@ class PasingTab:
         elif type(data) == list:
             self.client(data)
 
-    def server(self, data):
+    def server(self, dt):
 
-        if data[:self.flaglen] != self.flag:
-            return []
+        if dt[:self.flaglen] != self.flag:
+            return False
         else:
-            _t = data[self.flaglen:]
+            _t = dt[self.flaglen:]
             self.pac = _t.split(self.st_split)
             _mt = self.pac_type(int(_t[0]))
-            _mt.server()
+            if _mt:
+                _mt.server(self.pac)
+                return True
+            else:
+                return False
 
-    def client(self, data):
-        self.pac = data
-        _mt = self.pac_type(int(data[0]))
-        _mt.client()
+    def client(self, da):
+        self.pac = da
+        _mt = self.pac_type(int(da[0]))
+        if _mt:
+            print _mt.client(self.pac)
+            return _mt.client(self.pac)
+        else:
+            return ''
         #return self.flag + data
 
-    def pac_type(self, typ, server=True):
-        return {
-          0: self.defaultPacket(self.pac),
-        }[typ]
+    def pac_type(self, typ):
+
+        _di = {
+            0: self.defaultPacket(),
+        }
+        if typ in _di:
+            _f = _di[typ]
+            _f.st_split = self.st_split
+            _f.flag = self.flag
+            return _f
 
 
 def parse_pack(packet):
     return PasingTab(packet).res
 
 
-PasingTab('SFL0%sdgfsgagrgrg')
-PasingTab([0,543,'46346',346,'fg'])
+PasingTab('SFL0%sdgfsgagrgrg%1111111111111%sagg')
+PasingTab('SFL0%sdgfsgagrgrg 0000000000000')
+PasingTab([0,543,'46346',346,'fg', '1111111111111'])
+PasingTab([0,543,'46346',346,'fg', '0000000000000'])
 
