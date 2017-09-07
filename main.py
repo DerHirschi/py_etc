@@ -1,15 +1,11 @@
 #!/usr/bin/python
-
-from network.server import Server, ServerCfg
-
+#TODO Export Configs in extra File
+from network.server import Server, ServerCfg, shut_down
 
 _th = Server(ServerCfg)
 _th.start()
 
 _t = raw_input('Anykey to stop')
 
-s = ServerCfg.sockobj
-s.shutdown(0)
-
-ServerCfg.run_ind = False
+shut_down(ServerCfg)
 

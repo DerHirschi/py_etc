@@ -5,6 +5,7 @@ import time
 
 from etc.log import log
 from etc.net import fw
+from parsing import parse_pack
 
 
 class ServerCfg(object):
@@ -77,9 +78,7 @@ class Server(threading.Thread):
             try:
                 data = clt.recv(self.conf.cach)
                 if data and self.conf.run_ind:
-                    log('in_Data: {}'.format(data), 19)
-                    log('Size: {} Bytes'.format(len(data)), 19)
-
+                    _ret = parse_pack(data)
                 else:
                     break
             except:
@@ -87,3 +86,8 @@ class Server(threading.Thread):
         self.cli.remove(clt)
         clt.close()
 
+
+def shut_down(cfg):
+    s = cfg.sockobj
+    s.shutdown(0)
+    ServerCfg.run_ind = False
