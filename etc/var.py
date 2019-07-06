@@ -2,14 +2,17 @@ import os
 import time
 
 
-def array2sting(data, cut_flag=','):
+def array2string(data, cut_flag=',', cut_last=True):
     _temp = ''
     for i in range(len(data)):
         if type(data[i]) != str:
             _temp = _temp + str(data[i]) + cut_flag
         else:
             _temp = _temp + data[i] + cut_flag
-    return _temp[:(len(_temp) - 1)]
+    if cut_last:
+        return _temp[:(len(_temp) - 1)]
+    else:
+        return _temp[:(len(_temp))]
 
 
 def string2array(data, cut_flag=' ', cut_blank=True, conv2int=True):
@@ -28,9 +31,27 @@ def string2array(data, cut_flag=' ', cut_blank=True, conv2int=True):
                 _temp = _temp + [_data[i]]
     return _temp
 
+
 # Quelle: https://stackoverflow.com/questions/931092/reverse-a-string-in-python
 def rev_str(a_string):
     return a_string[::-1]
+
+
+def ck_str(_data):
+    if type(_data) != str:
+        _data = str(_data)
+    return _data
+
+
+def ck_list_ele_type(_data, _type):
+    if not type(_data) == list:
+        return 0
+    else:
+        for _i in _data:
+            if type(_i) != _type:
+                return 0
+        return 1
+
 
 def get_time(opt='all', string=False):
     def _monat(lst, trig):
@@ -54,7 +75,7 @@ def get_time(opt='all', string=False):
 
     def _conv_all():
         if string:
-            return array2sting(string2array(time.ctime(), ' '), '-')
+            return array2string(string2array(time.ctime(), ' '), '-')
         else:
             return string2array(time.ctime(), ' ')
 
@@ -90,6 +111,7 @@ def date2filename(f_name, time_form='date', cut_flag='_'):
 # 1 Option 'date'/'time'/'all'
 # 2 Cut_Flag -> c_f='_' -> 2017_9_1 or c_f='!' -> 2017!9!1
 
+
 def build_date_st(t_f, c_f):
     if t_f == 'all':
         return build_date_st('date', c_f) + c_f + build_date_st('time', c_f)
@@ -104,6 +126,7 @@ def build_date_st(t_f, c_f):
 # und der neue Dateinnamen String zurueck gegeben
 # 1 Dateiname
 # 2 Option ( 'count'/'date'/'time' ) -> date & time fuegt Datum oder Zeit vor dem Count ein
+
 
 def count_filename(f_name, opt='count'):
     def _count_st(_f_name, _end):
@@ -129,12 +152,33 @@ def count_filename(f_name, opt='count'):
             'time': _count_st(_n + build_date_st(opt, '-'), _e)
         }[opt]
 
+
 # Andert Dateiendung
 def change_file_ext(f_name, ext):
     return f_name[:(f_name.find('.'))] + '.{}'.format(ext)
 
 
-# Test it !!
+# Overflow a int var
+def overflow_int(_var, _bit=8):
+    _bit = (2**_bit) - 1
+    if _var > _bit:
+        return (_var - _bit), True
+    else:
+        return _var, False
+
+
+def overflow_value(val, overflow=1024):
+    return val % overflow
+
+
+def map_val(sensor_val, in_min, in_max, out_min, out_max):
+    # https://stackoverflow.com/questions/1969240/mapping-a-range-of-values-to-another
+    out_range = out_max - out_min
+    in_range = in_max - in_min
+    in_val = sensor_val - in_min
+    val = (float(in_val)/in_range)*out_range
+    out_val = out_min + val
+    return out_val
 
 if __name__ == '__main__':
-    print change_file_ext('test.txt', 'crp')
+    print(overflow_int(256))
