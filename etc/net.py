@@ -1,13 +1,40 @@
 # Author : DerHirschi
-import commands
 import os
+import subprocess
 
-from var import string2array, array2sting
-from log import log
+from etc.var import string2array, array2string
 
 
+def ip_online(ip, timeout=5, interval=0.250, count=1):
+    _out = subprocess.getoutput("ping {} -i {} -w {} -c {}".format(ip, interval, timeout, count))
+    _i = _out.find("time=")
+    if not _i == -1:
+        _out = _out[_i:(_i + 13)]
+        _out = _out.replace("time=", "")
+        _out = _out.replace(" ms", "")
+        return float(_out)
+    else:
+        return float(-1)
+
+
+def wol(mac):
+    if subprocess.getoutput("wakeonlan {}".format(mac)):
+        return True
+    else:
+        return False
+
+
+def keepalive_winhost(ip):
+    out = subprocess.getoutput("smbclient -L //{}/ -N".format(ip))
+    if out.find("NT_STATUS_IO_TIMEOUT") == -1:
+        return True
+    else:
+        return False
+
+
+# TODO Kein Pipe mehr via cmd ... Stringsuche
 def getdefault_iface(opt='ip'):
-    return commands.getoutput("/sbin/ip route | grep default " + (
+    return subprocess.getoutput("ip route | grep default " + (
                                     {
                                         'ip': "| awk {'print $3'}",
                                         'iface': "| awk {'print $5'}",
@@ -17,7 +44,7 @@ def getdefault_iface(opt='ip'):
 
 def getall_iface(opt='ip'):
     return {
-        'ip': string2array(commands.getoutput("/sbin/ifconfig | grep -i \"inet\" | grep -iv \"inet6\" | " +
+        'ip': string2array(subprocess.getoutput("ifconfig | grep -i \"inet\" | grep -iv \"inet6\" | " +
                                               "awk {'print $2'} | sed -ne 's/addr\:/ /p'")[1:], '\n '),
         'iface': os.listdir('/sys/class/net/'),
     }[opt]
@@ -64,7 +91,7 @@ def calc_ip_subnet(ip, subnet):
 
         _ip[i] = int(_tempres, 2)
 
-    return array2sting(_ip, '.')
+    return array2string(_ip, '.')
 
 # Args
 # 1. Rule string to reverse (Switch from A to D or D to A) | leave '' if not use .. default -> not in use
@@ -88,7 +115,7 @@ def calc_ip_subnet(ip, subnet):
 def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_iface(), mode='ACCEPT'):
     # Root User check
     if os.geteuid() != 0:
-        log('You must be super-user. Cant change Firewall Rules for u..', 13)
+        print ('You must be super-user. Cant change Firewall Rules for u..')
         return ''
     else:
         # Rule Reverse Fnc
@@ -100,14 +127,14 @@ def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_i
 
         # Check Rule
         def _fnc_chk_rules(rule):
-            _cmd = '/sbin/' + rule[0:10] + 'C' + rule[11:]
+            _cmd = rule[0:10] + 'C' + rule[11:]
             if rule[10:11] == 'D':
-                if commands.getoutput(_cmd) == '':
+                if subprocess.getoutput(_cmd) == '':
                     return True
                 else:
                     return False
             else:
-                if commands.getoutput(_cmd) != '':
+                if subprocess.getoutput(_cmd) != '':
                     return True
                 else:
                     return False
@@ -115,10 +142,8 @@ def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_i
         if revrule != '':
             _st = _fnc_rev_rules(revrule)
             if _fnc_chk_rules(_st):
-                log('Changed {}'.format(_st), 12)
-                return _st, commands.getoutput('/sbin/' + _st)
+                return _st, subprocess.getoutput(_st)
             else:
-                log('Cant change {}'.format(_st), 13)
                 return ''
         else:
             switch = {
@@ -144,9 +169,13 @@ def fw(revrule='', switch=False, proto='tcp', port='', src='', dest=getdefault_i
         )
 
         if _fnc_chk_rules(_st):
-            log('Changed {}'.format(_st), 12)
-            return _st, commands.getoutput('/sbin/' + _st)
+            return _st, subprocess.getoutput(_st)
         else:
-            log('Cant change {}'.format(_st), 13)
             return ''
 
+
+# Test it !!
+if __name__ == '__main__':
+
+    print (calc_ip_subnet('192.168.1.101', 16))
+    print (calc_ip_subnet('192.168.1.101', '255.255.255.128'))
